@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bth0j3pa7s8g0"]
+
+[ext_resource type="Script" uid="uid://b15dabnffjmgt" path="res://Scripts/enemy.gd" id="1_1f0kj"]
+[ext_resource type="Texture2D" uid="uid://bfi8xyn0na4lg" path="res://Assets/sam_altman_head.png" id="1_hghv2"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1f0kj"]
+atlas = ExtResource("1_hghv2")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0egyu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1f0kj")
+}],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}]
+
+[node name="Enemy" type="Area2D" unique_id=1864777275 groups=["enemy"]]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_1f0kj")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=14059370]
+sprite_frames = SubResource("SpriteFrames_0egyu")
+animation = &"Idle"
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=495608208]
+polygon = PackedVector2Array(0, 12, 6, 9, 6, 0, 6, -8, -7, -8, -7, 9)
+
+[node name="Timer" type="Timer" parent="." unique_id=1473159502]
+wait_time = 0.1
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

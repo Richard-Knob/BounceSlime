@@ -1,0 +1,97 @@
+[gd_scene format=3 uid="uid://cckm7pokuqdme"]
+
+[ext_resource type="Texture2D" uid="uid://bnis46bamwx5c" path="res://Assets/platform.png" id="1_wowpa"]
+[ext_resource type="Script" uid="uid://bajl2ngcotw42" path="res://Scripts/terrain.gd" id="2_3dryh"]
+[ext_resource type="PackedScene" uid="uid://cva6iek811g7c" path="res://Scenes/player.tscn" id="2_wrm1d"]
+[ext_resource type="Script" uid="uid://28ua8w07v8xd" path="res://Scripts/background.gd" id="3_3dryh"]
+[ext_resource type="Texture2D" uid="uid://dfpd5hbndag38" path="res://Assets/background.png" id="3_i6g32"]
+[ext_resource type="Script" uid="uid://dnpgcq130x6fs" path="res://Scripts/pivot.gd" id="6_1l0tm"]
+[ext_resource type="Texture2D" uid="uid://buov2bm4op1ab" path="res://Assets/arrow.png" id="6_i6g32"]
+[ext_resource type="Script" uid="uid://cipbmcvtsjmsg" path="res://Scripts/void.gd" id="8_v158k"]
+[ext_resource type="Script" uid="uid://dh5c3d06jbfmf" path="res://Scripts/spawner.gd" id="9_h4fw4"]
+[ext_resource type="PackedScene" path="res://Scenes/pause_menu.tscn" id="10_pause"]
+[ext_resource type="PackedScene" path="res://Scenes/hud.tscn" id="11_hud"]
+[ext_resource type="PackedScene" path="res://Scenes/victory_screen.tscn" id="12_victory"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wowpa"]
+texture = ExtResource("1_wowpa")
+0:0/size_in_atlas = Vector2i(2, 2)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSet" id="TileSet_i6g32"]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_wowpa")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v158k"]
+texture = ExtResource("3_i6g32")
+0:0/size_in_atlas = Vector2i(2, 2)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_6t5aa"]
+tile_size = Vector2i(32, 32)
+sources/0 = SubResource("TileSetAtlasSource_v158k")
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_0egyu"]
+
+[node name="Game" type="Node2D" unique_id=205666969]
+
+[node name="Visuals" type="Node" parent="." unique_id=1052380953]
+
+[node name="Terrain" type="TileMapLayer" parent="Visuals" unique_id=436563428 node_paths=PackedStringArray("player")]
+tile_set = SubResource("TileSet_i6g32")
+script = ExtResource("2_3dryh")
+player = NodePath("../../Player")
+
+[node name="Background" type="TileMapLayer" parent="Visuals" unique_id=2084592456 node_paths=PackedStringArray("player")]
+z_index = -1
+tile_set = SubResource("TileSet_6t5aa")
+script = ExtResource("3_3dryh")
+player = NodePath("../../Player")
+
+[node name="Player" parent="." unique_id=1263722073 instance=ExtResource("2_wrm1d")]
+position = Vector2(16, 2)
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=390861174]
+position = Vector2(0, -8)
+zoom = Vector2(2, 2)
+position_smoothing_enabled = true
+
+[node name="Pivot" type="Node2D" parent="Player" unique_id=1320002247]
+position = Vector2(0, -8)
+rotation = -0.0052359877
+script = ExtResource("6_1l0tm")
+
+[node name="Arrow" type="Sprite2D" parent="Player/Pivot" unique_id=51073700]
+position = Vector2(0.29902503, -40.310177)
+texture = ExtResource("6_i6g32")
+
+[node name="Void" type="Area2D" parent="." unique_id=1877911397]
+position = Vector2(0, 350)
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("8_v158k")
+
+[node name="Timer" type="Timer" parent="Void" unique_id=1341690439]
+wait_time = 0.3
+one_shot = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Void" unique_id=240484031]
+shape = SubResource("WorldBoundaryShape2D_0egyu")
+
+[node name="Spawner" type="Node2D" parent="." unique_id=1100026807]
+script = ExtResource("9_h4fw4")
+
+[node name="Timer" type="Timer" parent="Spawner" unique_id=483315277]
+autostart = true
+
+[node name="PauseMenu" parent="." instance=ExtResource("10_pause")]
+
+[node name="HUD" parent="." instance=ExtResource("11_hud")]
+
+[node name="VictoryScreen" parent="." instance=ExtResource("12_victory")]
+
+[connection signal="body_entered" from="Void" to="Void" method="_on_body_entered"]
+[connection signal="timeout" from="Void/Timer" to="Void" method="_on_timer_timeout"]
+[connection signal="timeout" from="Spawner/Timer" to="Spawner" method="_on_timer_timeout"]
